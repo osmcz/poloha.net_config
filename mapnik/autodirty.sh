@@ -9,6 +9,9 @@ find kct/ -type f | xargs touch
 find landuse/ -type f | xargs touch
 find parcely/ -type f | xargs touch
 find ulice/ -type f | xargs touch
+find hills/ -type f | xargs touch
+find contours/ -type f | xargs touch
+find contours_ortofoto/ -type f | xargs touch
 cd default/
 find 0/ -type f | xargs touch
 find 1/ -type f | xargs touch
