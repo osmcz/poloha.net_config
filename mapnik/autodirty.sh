@@ -1,6 +1,5 @@
 #!/bin/bash
 mypwd=$PWD
-touch ~/mod_tile/tiles/planet-import-complete
 cd ~/mod_tile/tiles/
 find adresy/ -type f | xargs touch
 find budovy/ -type f | xargs touch
@@ -25,3 +24,4 @@ find 8/ -type f | xargs touch
 find 9/ -type f | xargs touch
 find 10/ -type f | xargs touch
 cd $mypwd
+touch -d '-3 days' ~/mod_tile/tiles/planet-import-complete
