@@ -5,7 +5,7 @@ set work_mem='128MB';
 create temp table cz_kct_temp as 
   select osm_id,route,name,ref,network,kct_yellow,kct_green,kct_blue,kct_red
   from cz_line where
-    kct_yellow is not NULL or kct_green is not NULL or kct_blue is not NULL or kct_red is not NULL or network in ('iwn','e-road');
+    kct_yellow is not NULL or kct_green is not NULL or kct_blue is not NULL or kct_red is not NULL or network = 'iwn';
 create index cz_kct_temp_id on cz_kct_temp using btree (osm_id);
 
 -- vytvorime tabuli relaci s parts cest
@@ -32,13 +32,13 @@ insert into cz_kct_temp (osm_id,route,name,ref,network,kct_yellow,kct_green,kct_
     from cz_kct_rels_temp;
 
 -- procisteni - v parts jsou i jine veci nez cesty
-delete from cz_kct_temp where osm_id not in (select osm_id from cz_line) or (kct_yellow is NULL and kct_green is NULL and kct_blue is NULL and kct_red is NULL and network not in ('iwn','e-road'));
+delete from cz_kct_temp where osm_id not in (select osm_id from cz_line) or (kct_yellow is NULL and kct_green is NULL and kct_blue is NULL and kct_red is NULL and network != 'iwn');
 
 -- na zaver to pak nasypat do cz_kct (max, group by) a pridat geometrii
 create temp table cz_kct_full (like cz_kct);
 insert into cz_kct_full (osm_id,route,name,network,kct_yellow,kct_green,kct_blue,kct_red) select osm_id,max(route) as route, max(name) as name, networkmax(network) as network, kctmax(kct_yellow) as kct_yellow, kctmax(kct_green) as kct_green, kctmax(kct_blue) as kct_blue, kctmax(kct_red) as kct_red from cz_kct_temp group by osm_id;
 update cz_kct_full set way = (select way from cz_line where cz_kct_full.osm_id = cz_line.osm_id);
-update cz_kct_full set kct_red='international' where network in ('iwn','e-road') and kct_red is NULL;
+update cz_kct_full set kct_red='international' where network = 'iwn' and kct_red is NULL;
 
 begin;
 truncate cz_kct;
