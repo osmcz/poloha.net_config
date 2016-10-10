@@ -10,8 +10,10 @@ create index cz_kct_temp_id on cz_kct_temp using btree (osm_id);
 
 -- vytvorime tabuli relaci s parts cest
 create temp table cz_kct_rels_temp as
-  select id,unnest(parts) as parts, NULL::text as route, NULL::text as name, NULL::text as network, NULL::text as ref, NULL::text as kct_yellow, NULL::text as kct_green, NULL::text as kct_blue, NULL::text as kct_red
-    from cz_rels where id in (select - osm_id from cz_kct_temp where osm_id < 0);
+  select id,substr(parts,2)::bigint as parts, NULL::text as route, NULL::text as name, NULL::text as network, NULL::text as ref, NULL::text as kct_yellow, NULL::text as kct_green, NULL::text as kct_blue, NULL::text as kct_red from
+    (select id,unnest(members) as parts, NULL::text as route, NULL::text as name, NULL::text as network, NULL::text as ref, NULL::text as kct_yellow, NULL::text as kct_green, NULL::text as kct_blue, NULL::text as kct_red
+      from cz_rels where id in (select - osm_id from cz_kct_temp where osm_id < 0)) foo
+  where parts ~ '^w[0-9]*';
 create index cz_kct_rels_temp_idx on cz_kct_rels_temp using btree(id);
 create index cz_kct_rels_temp_parts on cz_kct_rels_temp using btree(parts);
 
